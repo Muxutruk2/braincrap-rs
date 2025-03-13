@@ -1,6 +1,7 @@
 use crate::tokenizer::BraincrapToken;
 use crate::tokenizer::Lexer;
 use std::fs;
+use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
 pub enum BraincrapCommand {
@@ -28,33 +29,40 @@ pub enum BraincrapCommand {
 }
 
 pub struct Parser<'a> {
+    pwd: PathBuf, // Saves the current directory for relative imports
     tokens: &'a [BraincrapToken],
     current_position: usize,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(tokens: &'a [BraincrapToken]) -> Self {
+    pub fn new(tokens: &'a [BraincrapToken], pwd: PathBuf) -> Self {
         Parser {
+            pwd,
             tokens,
             current_position: 0,
         }
     }
 
     fn parse_macro(&mut self, name: char, tokens: Vec<BraincrapToken>) -> BraincrapCommand {
-        let mut nested_parser = Parser::new(&tokens);
+        let mut nested_parser = Parser::new(tokens.as_slice(), self.pwd.clone());
         let code = nested_parser.parse();
 
         BraincrapCommand::DefineMacro { name, tokens, code }
     }
 
     fn parse_import(&mut self, filename: String) -> BraincrapCommand {
-        let file_content = fs::read_to_string(&filename).unwrap_or_else(|_| {
-            eprintln!("Failed to read file: {}", filename);
+        let filepath = self.pwd.join(&filename); // Resolve relative path
+        let file_content = fs::read_to_string(&filepath).unwrap_or_else(|_| {
+            eprintln!("Failed to read file: {}", filepath.display());
             String::new()
         });
+
         let mut lexer = Lexer::new(file_content);
         let tokens = lexer.tokenize();
-        let mut nested_parser = Parser::new(&tokens);
+        let mut nested_parser = Parser::new(
+            &tokens,
+            filepath.parent().unwrap_or(&self.pwd).to_path_buf(),
+        );
         let code = nested_parser.parse();
 
         BraincrapCommand::Import {

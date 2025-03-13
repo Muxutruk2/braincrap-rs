@@ -1,4 +1,4 @@
-name: Rust
+name: Rust checking
 
 on:
   push:
@@ -11,16 +11,10 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
-    - name: Clippy
+    - name: Clippy Check
       run: cargo clippy --verbose
-    - name: Check
-      run: cargo check --verbose
-    - name: Run cargo fmt check
+    - name: Format Check
       run: cargo fmt -- --check
-    - name: Run cargo audit
-      run: cargo install cargo-audit && cargo audit

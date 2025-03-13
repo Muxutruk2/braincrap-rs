@@ -64,16 +64,15 @@ impl Lexer {
                 }
                 '#' => {
                     self.index += 1;
-                    let macro_name = match ILLEGAL_MACROS.contains(&self.current_char()) {
-                        false => self.current_char(),
-                        true => {
-                            error!(
-                                "Illegal macro name at index {}: {}",
-                                self.index,
-                                self.current_char()
-                            );
-                            'e' // Default to an arbitrary invalid macro name
-                        }
+                    let macro_name = if ILLEGAL_MACROS.contains(&self.current_char()) {
+                        error!(
+                            "Illegal macro name at index {}: {}",
+                            self.index,
+                            self.current_char()
+                        );
+                        'e' // Default to an arbitrary invalid macro name
+                    } else {
+                        self.current_char()
                     };
                     self.index += 1;
                     self.index += 1;
@@ -147,6 +146,9 @@ impl Lexer {
 
     /// Returns the current character without advancing the position.
     fn current_char(&self) -> char {
-        self.input.chars().nth(self.index as usize).unwrap_or('\0')
+        self.input
+            .chars()
+            .nth(usize::try_from(self.index).unwrap_or(0))
+            .unwrap_or('\0')
     }
 }

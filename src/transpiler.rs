@@ -49,13 +49,12 @@ impl Transpiler {
             BraincrapCommand::Output => ".".to_string(),
             BraincrapCommand::Input => ",".to_string(),
 
-            /// Defines a macro and stores its transpiled representation.
             BraincrapCommand::DefineMacro {
                 name,
                 tokens: _tokens,
                 code,
             } => {
-                let commands: Vec<BraincrapCommand> = code.to_vec();
+                let commands: Vec<BraincrapCommand> = code.clone();
                 if !self.macros.contains_key(name) {
                     let expanded_code = self.transpile(commands);
                     self.macros.insert(*name, expanded_code);
@@ -63,7 +62,6 @@ impl Transpiler {
                 String::new()
             }
 
-            /// Expands a previously defined macro.
             BraincrapCommand::RunMacro { name } => {
                 match self.macros.get(name) {
                     Some(expanded_code) => expanded_code.clone(),
@@ -71,13 +69,12 @@ impl Transpiler {
                 }
             }
 
-            /// Transpiles imported Braincrap code by recursively processing its commands.
             BraincrapCommand::Import {
                 file: _file,
                 tokens: _tokens,
                 code,
             } => {
-                let commands: Vec<BraincrapCommand> = code.to_vec();
+                let commands: Vec<BraincrapCommand> = code.clone();
                 self.transpile(commands)
             }
         }

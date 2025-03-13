@@ -1,3 +1,12 @@
+#![deny(clippy::all)]
+#![deny(clippy::pedantic)]
+#![deny(clippy::complexity)]
+#![deny(clippy::style)]
+#![deny(clippy::correctness)]
+#![warn(clippy::unused_io_amount)]
+#![warn(clippy::unwrap_used)]
+#![warn(clippy::unnecessary_unwrap)]
+#![warn(clippy::expect_used)]
 use clap::{Arg, Command};
 use std::path::Path;
 mod parser;
@@ -31,7 +40,7 @@ fn main() {
     Builder::from_env(env).init();
 
     // Get the input and pwd
-    let input_path = Path::new(matches.get_one::<String>("input").unwrap());
+    let input_path = Path::new(matches.get_one::<String>("input").map_or("main.bc", |v| v));
     let pwd = input_path.parent().unwrap_or(Path::new(".")).to_path_buf();
 
     // Read the file
@@ -53,8 +62,8 @@ fn main() {
     // Handle output
     if let Some(output_path) = matches.get_one::<String>("output") {
         fs::write(output_path, transpiled_code)
-            .unwrap_or_else(|_| panic!("Failed to write to output file: {}", output_path));
+            .unwrap_or_else(|_| panic!("Failed to write to output file: {output_path}"));
     } else {
-        println!("{}", transpiled_code);
+        println!("{transpiled_code}",);
     }
 }

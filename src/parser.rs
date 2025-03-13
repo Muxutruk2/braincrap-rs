@@ -3,6 +3,7 @@ use crate::tokenizer::Lexer;
 use std::fs;
 use std::path::PathBuf;
 
+/// Represents a Braincrap command that the parser recognizes.
 #[derive(Debug, Clone)]
 pub enum BraincrapCommand {
     Addition,
@@ -13,14 +14,17 @@ pub enum BraincrapCommand {
     CloseLoop,
     Output,
     Input,
+    /// Defines a macro
     DefineMacro {
         name: char,
         tokens: Vec<BraincrapToken>,
         code: Vec<BraincrapCommand>,
     },
+    /// Runs a macro
     RunMacro {
         name: char,
     },
+    /// Imports another Braincrap script or library from a file
     Import {
         file: String,
         tokens: Vec<BraincrapToken>,
@@ -28,13 +32,22 @@ pub enum BraincrapCommand {
     },
 }
 
+/// A parser for Braincrap language tokens.
 pub struct Parser<'a> {
-    pwd: PathBuf, // Saves the current directory for relative imports
+    /// Stores the current working directory for resolving relative imports.
+    pwd: PathBuf,
+    /// A slice of Braincrap tokens to be parsed.
     tokens: &'a [BraincrapToken],
+    /// Tracks the current position within the token stream.
     current_position: usize,
 }
 
 impl<'a> Parser<'a> {
+    /// Creates a new `Parser` instance.
+    ///
+    /// # Arguments
+    /// * `tokens` - A slice of `BraincrapToken` representing the input program.
+    /// * `pwd` - The current working directory for handling file imports.
     pub fn new(tokens: &'a [BraincrapToken], pwd: PathBuf) -> Self {
         Parser {
             pwd,
@@ -43,6 +56,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Parses a macro definition.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the macro.
+    /// * `tokens` - The list of tokens forming the macro body.
     fn parse_macro(&mut self, name: char, tokens: Vec<BraincrapToken>) -> BraincrapCommand {
         let mut nested_parser = Parser::new(tokens.as_slice(), self.pwd.clone());
         let code = nested_parser.parse();
@@ -50,8 +68,12 @@ impl<'a> Parser<'a> {
         BraincrapCommand::DefineMacro { name, tokens, code }
     }
 
+    /// Parses an import statement and loads another Braincrap script.
+    ///
+    /// # Arguments
+    /// * `filename` - The path to the file to be imported.
     fn parse_import(&mut self, filename: String) -> BraincrapCommand {
-        let filepath = self.pwd.join(&filename); // Resolve relative path
+        let filepath = self.pwd.join(&filename);
         let file_content = fs::read_to_string(&filepath).unwrap_or_else(|_| {
             eprintln!("Failed to read file: {}", filepath.display());
             String::new()
@@ -72,6 +94,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Retrieves the next token from the stream, advancing the position.
     fn next_token(&mut self) -> Option<BraincrapToken> {
         if self.current_position < self.tokens.len() {
             self.current_position += 1;
@@ -80,7 +103,9 @@ impl<'a> Parser<'a> {
             None
         }
     }
-    fn previous_token(&mut self) -> Option<BraincrapToken> {
+
+    /// Retrieves the previous token without advancing the position.
+    fn peek_previous(&mut self) -> Option<BraincrapToken> {
         if self.current_position < self.tokens.len() {
             Some(self.tokens[self.current_position].clone())
         } else {
@@ -88,6 +113,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Parses the token stream and produces a list of `BraincrapCommand`s.
     pub fn parse(&mut self) -> Vec<BraincrapCommand> {
         let mut commands = Vec::new();
 
@@ -119,7 +145,7 @@ impl<'a> Parser<'a> {
                 }
 
                 BraincrapToken::Char(m) => {
-                    if let Some(BraincrapToken::Hash) = self.previous_token() {
+                    if let Some(BraincrapToken::Hash) = self.peek_previous() {
                         // Skip macro definition name token handling here
                     } else {
                         commands.push(BraincrapCommand::RunMacro { name: m });

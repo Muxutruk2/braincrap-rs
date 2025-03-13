@@ -26,12 +26,15 @@ fn main() {
         )
         .get_matches();
 
+    // Logging initalization. Set RUST_LOG in the shell
     let env = env_logger::Env::default().filter_or("RUST_LOG", "debug");
     Builder::from_env(env).init();
 
+    // Get the input and pwd
     let input_path = Path::new(matches.get_one::<String>("input").unwrap());
     let pwd = input_path.parent().unwrap_or(Path::new(".")).to_path_buf();
 
+    // Read the file
     let input = fs::read_to_string(input_path)
         .unwrap_or_else(|_| panic!("Failed to read file: {}", input_path.display()));
 
@@ -47,8 +50,8 @@ fn main() {
     let transpiled_code = transpiler.transpile(commands);
     debug!("Transpiled: {transpiled_code}");
 
+    // Handle output
     if let Some(output_path) = matches.get_one::<String>("output") {
-        // <- Fix: replaces `.value_of(...)`
         fs::write(output_path, transpiled_code)
             .unwrap_or_else(|_| panic!("Failed to write to output file: {}", output_path));
     } else {

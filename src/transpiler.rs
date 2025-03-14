@@ -7,6 +7,12 @@ pub struct Transpiler {
     macros: HashMap<char, String>,
 }
 
+impl Default for Transpiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Transpiler {
     /// Creates a new `Transpiler` instance.
     pub fn new() -> Self {
@@ -55,10 +61,9 @@ impl Transpiler {
                 code,
             } => {
                 let commands: Vec<BraincrapCommand> = code.clone();
-                if !self.macros.contains_key(name) {
-                    let expanded_code = self.transpile(commands);
-                    self.macros.insert(*name, expanded_code);
-                }
+                let expanded_code = self.transpile(commands);
+                self.macros.insert(*name, expanded_code);
+
                 String::new()
             }
 

@@ -7,7 +7,8 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::unnecessary_unwrap)]
 #![warn(clippy::expect_used)]
-
+#![allow(unexpected_cfgs)]
+#![cfg(not(test))]
 use braincrap_rs::parser::{BraincrapCommand, Parser};
 use braincrap_rs::tokenizer;
 use braincrap_rs::transpiler::Transpiler;

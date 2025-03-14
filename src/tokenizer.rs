@@ -6,7 +6,7 @@ const ILLEGAL_MACROS: &[char] = &[
 use log::error;
 
 /// Represents different token types recognized by the lexer.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum BraincrapToken {
     Plus,
     Minus,

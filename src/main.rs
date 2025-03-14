@@ -7,17 +7,15 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::unnecessary_unwrap)]
 #![warn(clippy::expect_used)]
+
+use braincrap_rs::parser::{BraincrapCommand, Parser};
+use braincrap_rs::tokenizer;
+use braincrap_rs::transpiler::Transpiler;
 use clap::{Arg, Command};
-use std::path::Path;
-mod parser;
-mod tokenizer;
-mod transpiler;
-use crate::parser::BraincrapCommand;
-use crate::parser::Parser;
-use crate::transpiler::Transpiler;
 use env_logger::Builder;
 use log::debug;
 use std::fs;
+use std::path::Path;
 
 fn main() {
     let matches = Command::new("Transpile Braincrap")

@@ -4,7 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 
 /// Represents a Braincrap command that the parser recognizes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum BraincrapCommand {
     Addition,
     Substraction,

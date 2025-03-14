@@ -80,13 +80,24 @@
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::parser::BraincrapCommand;
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::parser::BraincrapCommand;
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="doccomment">/// A transpiler that converts Braincrap commands into Brainfuck code.
 </span><span class="kw">pub struct </span>Transpiler {
     <span class="doccomment">/// Stores defined macros, mapping their names to their transpiled code.
     </span>macros: HashMap&lt;char, String&gt;,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>Transpiler {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
+    }
 }
 
 <span class="kw">impl </span>Transpiler {
@@ -137,10 +148,9 @@
                 code,
             } =&gt; {
                 <span class="kw">let </span>commands: Vec&lt;BraincrapCommand&gt; = code.clone();
-                <span class="kw">if </span>!<span class="self">self</span>.macros.contains_key(name) {
-                    <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile(commands);
-                    <span class="self">self</span>.macros.insert(<span class="kw-2">*</span>name, expanded_code);
-                }
+                <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile(commands);
+                <span class="self">self</span>.macros.insert(<span class="kw-2">*</span>name, expanded_code);
+
                 String::new()
             }
 

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Transpiler"]};
+window.SIDEBAR_ITEMS = {"enum":["TranspilerArguments"],"struct":["Transpiler"]};

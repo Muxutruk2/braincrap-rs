@@ -85,8 +85,38 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::parser::BraincrapCommand;
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::parser::BraincrapCommand;
 <span class="kw">use </span>std::collections::HashMap;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">pub enum </span>TranspilerArguments {
+    C,
+    Brainfuck,
+}
 
 <span class="doccomment">/// A transpiler that converts Braincrap commands into Brainfuck code.
 </span><span class="kw">pub struct </span>Transpiler {
@@ -108,30 +138,44 @@
         }
     }
 
-    <span class="doccomment">/// Transpiles a vector of `BraincrapCommand`s into a Brainfuck-compatible string.
-    ///
-    /// # Arguments
-    /// * `commands` - A vector of `BraincrapCommand`s to be transpiled.
-    ///
-    /// # Returns
-    /// A `String` containing the equivalent Brainfuck code.
-    </span><span class="kw">pub fn </span>transpile(<span class="kw-2">&amp;mut </span><span class="self">self</span>, commands: Vec&lt;BraincrapCommand&gt;) -&gt; String {
+    <span class="doccomment">/// Transpiles a vector of `BraincrapCommand`s into either Brainfuck or C.
+    </span><span class="kw">pub fn </span>transpile(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        commands: Vec&lt;BraincrapCommand&gt;,
+        args: <span class="kw-2">&amp;</span>TranspilerArguments,
+    ) -&gt; String {
+        <span class="kw">match </span>args {
+            TranspilerArguments::Brainfuck =&gt; <span class="self">self</span>.transpile_brainfuck(commands),
+            TranspilerArguments::C =&gt; <span class="self">self</span>.transpile_c(commands),
+        }
+    }
+
+    <span class="doccomment">/// Transpiles to Brainfuck
+    </span><span class="kw">fn </span>transpile_brainfuck(<span class="kw-2">&amp;mut </span><span class="self">self</span>, commands: Vec&lt;BraincrapCommand&gt;) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>output = String::new();
+
         <span class="kw">for </span>command <span class="kw">in </span>commands {
-            <span class="kw">let </span>bf_command = <span class="self">self</span>.transpile_command(<span class="kw-2">&amp;</span>command);
+            <span class="kw">let </span>bf_command = <span class="self">self</span>.transpile_command_bf(<span class="kw-2">&amp;</span>command);
             output.push_str(<span class="kw-2">&amp;</span>bf_command);
         }
+
         output
     }
 
-    <span class="doccomment">/// Transpiles a single `BraincrapCommand` into its Brainfuck equivalent.
-    ///
-    /// # Arguments
-    /// * `command` - A reference to a `BraincrapCommand`.
-    ///
-    /// # Returns
-    /// A `String` containing the Brainfuck representation of the command.
-    </span><span class="kw">fn </span>transpile_command(<span class="kw-2">&amp;mut </span><span class="self">self</span>, command: <span class="kw-2">&amp;</span>BraincrapCommand) -&gt; String {
+    <span class="doccomment">/// Transpiles to C
+    </span><span class="kw">fn </span>transpile_c(<span class="kw-2">&amp;mut </span><span class="self">self</span>, commands: Vec&lt;BraincrapCommand&gt;) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>output = String::new();
+
+        <span class="kw">for </span>command <span class="kw">in </span>commands {
+            <span class="kw">let </span>c_line = <span class="self">self</span>.transpile_command_c(<span class="kw-2">&amp;</span>command);
+            output.push_str(<span class="kw-2">&amp;</span>c_line);
+        }
+
+        output
+    }
+
+    <span class="doccomment">/// Transpiles a single Braincrap command into Brainfuck
+    </span><span class="kw">fn </span>transpile_command_bf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, command: <span class="kw-2">&amp;</span>BraincrapCommand) -&gt; String {
         <span class="kw">match </span>command {
             BraincrapCommand::Addition =&gt; <span class="string">"+"</span>.to_string(),
             BraincrapCommand::Substraction =&gt; <span class="string">"-"</span>.to_string(),
@@ -141,34 +185,38 @@
             BraincrapCommand::CloseLoop =&gt; <span class="string">"]"</span>.to_string(),
             BraincrapCommand::Output =&gt; <span class="string">"."</span>.to_string(),
             BraincrapCommand::Input =&gt; <span class="string">","</span>.to_string(),
-
-            BraincrapCommand::DefineMacro {
-                name,
-                tokens: _tokens,
-                code,
-            } =&gt; {
-                <span class="kw">let </span>commands: Vec&lt;BraincrapCommand&gt; = code.clone();
-                <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile(commands);
+            BraincrapCommand::DefineMacro { name, code, .. } =&gt; {
+                <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile_brainfuck(code.clone());
                 <span class="self">self</span>.macros.insert(<span class="kw-2">*</span>name, expanded_code);
-
                 String::new()
             }
-
             BraincrapCommand::RunMacro { name } =&gt; {
-                <span class="kw">match </span><span class="self">self</span>.macros.get(name) {
-                    <span class="prelude-val">Some</span>(expanded_code) =&gt; expanded_code.clone(),
-                    <span class="prelude-val">None </span>=&gt; String::new(), <span class="comment">// Undefined macros produce no output
-                </span>}
+                <span class="self">self</span>.macros.get(name).cloned().unwrap_or_else(String::new)
             }
+            BraincrapCommand::Import { code, .. } =&gt; <span class="self">self</span>.transpile_brainfuck(code.clone()),
+        }
+    }
 
-            BraincrapCommand::Import {
-                file: _file,
-                tokens: _tokens,
-                code,
-            } =&gt; {
-                <span class="kw">let </span>commands: Vec&lt;BraincrapCommand&gt; = code.clone();
-                <span class="self">self</span>.transpile(commands)
+    <span class="doccomment">/// Transpiles a single Braincrap command into C
+    </span><span class="kw">fn </span>transpile_command_c(<span class="kw-2">&amp;mut </span><span class="self">self</span>, command: <span class="kw-2">&amp;</span>BraincrapCommand) -&gt; String {
+        <span class="kw">match </span>command {
+            BraincrapCommand::Addition =&gt; <span class="string">"*ptr += 1;"</span>.to_string(),
+            BraincrapCommand::Substraction =&gt; <span class="string">"*ptr -= 1;"</span>.to_string(),
+            BraincrapCommand::MoveLeft =&gt; <span class="string">"ptr--;"</span>.to_string(),
+            BraincrapCommand::MoveRight =&gt; <span class="string">"ptr++;"</span>.to_string(),
+            BraincrapCommand::OpenLoop =&gt; <span class="string">"while (*ptr) {"</span>.to_string(),
+            BraincrapCommand::CloseLoop =&gt; <span class="string">"}"</span>.to_string(),
+            BraincrapCommand::Output =&gt; <span class="string">"putchar(*ptr);"</span>.to_string(),
+            BraincrapCommand::Input =&gt; <span class="string">"*ptr = getchar();"</span>.to_string(),
+            BraincrapCommand::DefineMacro { name, code, .. } =&gt; {
+                <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile_c(code.clone());
+                <span class="self">self</span>.macros.insert(<span class="kw-2">*</span>name, expanded_code);
+                String::new()
             }
+            BraincrapCommand::RunMacro { name } =&gt; {
+                <span class="self">self</span>.macros.get(name).cloned().unwrap_or_else(String::new)
+            }
+            BraincrapCommand::Import { code, .. } =&gt; <span class="self">self</span>.transpile_c(code.clone()),
         }
     }
 }

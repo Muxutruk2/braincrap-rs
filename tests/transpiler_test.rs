@@ -1,6 +1,6 @@
 #![allow(unexpected_cfgs)]
 use braincrap_rs::parser::BraincrapCommand;
-use braincrap_rs::transpiler::Transpiler;
+use braincrap_rs::transpiler::{Transpiler, TranspilerArguments};
 
 #[test]
 fn test_transpile_basic_commands() {
@@ -16,7 +16,7 @@ fn test_transpile_basic_commands() {
     ];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands);
+    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
 
     assert_eq!(result, "+-<>[].,");
 }
@@ -34,7 +34,7 @@ fn test_transpile_macro_definition_and_run() {
     ];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands);
+    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
 
     assert_eq!(result, "+>+>");
 }
@@ -46,7 +46,7 @@ fn test_transpile_macro_without_definition() {
     ];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands);
+    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
 
     assert_eq!(result, ""); // No output since macro 'b' is not defined
 }
@@ -69,7 +69,7 @@ fn test_transpile_macro_with_redefinition() {
     ];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands);
+    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
 
     assert_eq!(result, "+-");
 }
@@ -83,7 +83,7 @@ fn test_transpile_import() {
     }];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands);
+    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
 
     assert_eq!(result, "+<"); // Import from another file results in "+<"
 }
@@ -93,7 +93,7 @@ fn test_transpile_empty_input() {
     let commands: Vec<BraincrapCommand> = vec![];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands);
+    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
 
     assert_eq!(result, ""); // No commands to transpile
 }

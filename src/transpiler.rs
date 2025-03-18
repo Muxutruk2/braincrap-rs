@@ -89,14 +89,14 @@ impl Transpiler {
     /// Transpiles a single Braincrap command into C
     fn transpile_command_c(&mut self, command: &BraincrapCommand) -> String {
         match command {
-            BraincrapCommand::Addition => "*ptr += 1;".to_string(),
-            BraincrapCommand::Substraction => "*ptr -= 1;".to_string(),
-            BraincrapCommand::MoveLeft => "ptr--;".to_string(),
-            BraincrapCommand::MoveRight => "ptr++;".to_string(),
-            BraincrapCommand::OpenLoop => "while (*ptr) {".to_string(),
-            BraincrapCommand::CloseLoop => "}".to_string(),
-            BraincrapCommand::Output => "putchar(*ptr);".to_string(),
-            BraincrapCommand::Input => "*ptr = getchar();".to_string(),
+            BraincrapCommand::Addition => "a;".to_string(),
+            BraincrapCommand::Substraction => "s;".to_string(),
+            BraincrapCommand::MoveLeft => "l;".to_string(),
+            BraincrapCommand::MoveRight => "r;".to_string(),
+            BraincrapCommand::OpenLoop => "o;".to_string(),
+            BraincrapCommand::CloseLoop => "c;".to_string(),
+            BraincrapCommand::Output => "p;".to_string(),
+            BraincrapCommand::Input => "i;".to_string(),
             BraincrapCommand::DefineMacro { name, code, .. } => {
                 let expanded_code = self.transpile_c(code.clone());
                 self.macros.insert(*name, expanded_code);

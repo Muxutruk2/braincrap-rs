@@ -78,7 +78,8 @@ fn main() {
     debug!("Transpiled: {transpiled_code}");
 
     if let TranspilerArguments::C = transpiler_arg {
-        let c_start_setup = "#include <stdio.h>\n\nint main() {\n\tunsigned char tape[30000] = {0};\n\tunsigned char *ptr = tape;\n\n";
+        let c_start_setup = "#include <stdio.h>\n#define a (*ptr += 1)\n#define s (*ptr -= 1)\n#define l (ptr--)\n#define r (ptr++)\n#define o while (*ptr) {\n#define c }\n#define p putchar(*ptr)\n#define i (*ptr = getchar())\n\nint main() {\n\tunsigned char tape[30000] = {0};\n\tunsigned char *ptr = tape;\n\n";
+
         let c_end_setup = "\n\treturn 0;\n}\n";
 
         transpiled_code = format!("{c_start_setup}\t{transpiled_code}{c_end_setup}");

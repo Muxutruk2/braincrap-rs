@@ -200,14 +200,14 @@
     <span class="doccomment">/// Transpiles a single Braincrap command into C
     </span><span class="kw">fn </span>transpile_command_c(<span class="kw-2">&amp;mut </span><span class="self">self</span>, command: <span class="kw-2">&amp;</span>BraincrapCommand) -&gt; String {
         <span class="kw">match </span>command {
-            BraincrapCommand::Addition =&gt; <span class="string">"*ptr += 1;"</span>.to_string(),
-            BraincrapCommand::Substraction =&gt; <span class="string">"*ptr -= 1;"</span>.to_string(),
-            BraincrapCommand::MoveLeft =&gt; <span class="string">"ptr--;"</span>.to_string(),
-            BraincrapCommand::MoveRight =&gt; <span class="string">"ptr++;"</span>.to_string(),
-            BraincrapCommand::OpenLoop =&gt; <span class="string">"while (*ptr) {"</span>.to_string(),
-            BraincrapCommand::CloseLoop =&gt; <span class="string">"}"</span>.to_string(),
-            BraincrapCommand::Output =&gt; <span class="string">"putchar(*ptr);"</span>.to_string(),
-            BraincrapCommand::Input =&gt; <span class="string">"*ptr = getchar();"</span>.to_string(),
+            BraincrapCommand::Addition =&gt; <span class="string">"a;"</span>.to_string(),
+            BraincrapCommand::Substraction =&gt; <span class="string">"s;"</span>.to_string(),
+            BraincrapCommand::MoveLeft =&gt; <span class="string">"l;"</span>.to_string(),
+            BraincrapCommand::MoveRight =&gt; <span class="string">"r;"</span>.to_string(),
+            BraincrapCommand::OpenLoop =&gt; <span class="string">"o;"</span>.to_string(),
+            BraincrapCommand::CloseLoop =&gt; <span class="string">"c;"</span>.to_string(),
+            BraincrapCommand::Output =&gt; <span class="string">"p;"</span>.to_string(),
+            BraincrapCommand::Input =&gt; <span class="string">"i;"</span>.to_string(),
             BraincrapCommand::DefineMacro { name, code, .. } =&gt; {
                 <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile_c(code.clone());
                 <span class="self">self</span>.macros.insert(<span class="kw-2">*</span>name, expanded_code);

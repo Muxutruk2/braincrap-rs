@@ -16,9 +16,11 @@ fn test_transpile_basic_commands() {
     ];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
+    let bf_result = transpiler.transpile(commands.clone(), &TranspilerArguments::Brainfuck);
+    let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
-    assert_eq!(result, "+-<>[].,");
+    assert_eq!(c_result, "a;s;l;r;o;c;p;i;");
+    assert_eq!(bf_result, "+-<>[].,");
 }
 
 #[test]
@@ -34,21 +36,23 @@ fn test_transpile_macro_definition_and_run() {
     ];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
+    let bf_result = transpiler.transpile(commands.clone(), &TranspilerArguments::Brainfuck);
+    let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
-    assert_eq!(result, "+>+>");
+    assert_eq!(bf_result, "+>+>");
+    assert_eq!(c_result, "a;r;a;r;");
 }
 
 #[test]
 fn test_transpile_macro_without_definition() {
-    let commands = vec![
-        BraincrapCommand::RunMacro { name: 'b' }, // Undefined macro 'b'
-    ];
+    let commands = vec![BraincrapCommand::RunMacro { name: 'b' }];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
+    let bf_result = transpiler.transpile(commands.clone(), &TranspilerArguments::Brainfuck);
+    let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
-    assert_eq!(result, ""); // No output since macro 'b' is not defined
+    assert_eq!(bf_result, "");
+    assert_eq!(c_result, "");
 }
 
 #[test]
@@ -69,23 +73,27 @@ fn test_transpile_macro_with_redefinition() {
     ];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
+    let bf_result = transpiler.transpile(commands.clone(), &TranspilerArguments::Brainfuck);
+    let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
-    assert_eq!(result, "+-");
+    assert_eq!(bf_result, "+-");
+    assert_eq!(c_result, "a;s;");
 }
 
 #[test]
 fn test_transpile_import() {
     let commands = vec![BraincrapCommand::Import {
         file: "other.bcf".to_string(),
-        tokens: vec![], // Assuming empty tokens for simplicity
+        tokens: vec![],
         code: vec![BraincrapCommand::Addition, BraincrapCommand::MoveLeft],
     }];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
+    let bf_result = transpiler.transpile(commands.clone(), &TranspilerArguments::Brainfuck);
+    let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
-    assert_eq!(result, "+<"); // Import from another file results in "+<"
+    assert_eq!(bf_result, "+<");
+    assert_eq!(c_result, "a;l;");
 }
 
 #[test]
@@ -93,7 +101,9 @@ fn test_transpile_empty_input() {
     let commands: Vec<BraincrapCommand> = vec![];
 
     let mut transpiler = Transpiler::new();
-    let result = transpiler.transpile(commands, &TranspilerArguments::Brainfuck);
+    let bf_result = transpiler.transpile(commands.clone(), &TranspilerArguments::Brainfuck);
+    let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
-    assert_eq!(result, ""); // No commands to transpile
+    assert_eq!(bf_result, "");
+    assert_eq!(c_result, "");
 }

@@ -152,7 +152,31 @@
 <a href="#151" id="151">151</a>
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a></pre></div><pre class="rust"><code><span class="doccomment">/// Defines characters that cannot be used as macro names.
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a></pre></div><pre class="rust"><code><span class="doccomment">/// Defines characters that cannot be used as macro names.
 </span><span class="kw">const </span>ILLEGAL_MACROS: <span class="kw-2">&amp;</span>[char] = <span class="kw-2">&amp;</span>[
     <span class="string">'+'</span>, <span class="string">'-'</span>, <span class="string">'&gt;'</span>, <span class="string">'&lt;'</span>, <span class="string">'.'</span>, <span class="string">','</span>, <span class="string">'['</span>, <span class="string">']'</span>, <span class="string">' '</span>, <span class="string">'\t'</span>, <span class="string">'\n'</span>, <span class="string">'\r'</span>, <span class="string">'\x0C'</span>, <span class="string">'\x1B'</span>,
 ];
@@ -162,14 +186,14 @@
 <span class="doccomment">/// Represents different token types recognized by the lexer.
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, PartialOrd)]
 </span><span class="kw">pub enum </span>BraincrapToken {
-    Plus,
-    Minus,
-    Left,
-    Right,
+    Plus(usize),
+    Minus(usize),
+    Left(usize),
+    Right(usize),
     LeftBracket,
     RightBracket,
-    Dot,
-    Comma,
+    Dot(usize),
+    Comma(usize),
     Hash,
     Dollar,
     <span class="doccomment">/// Represents a string, used for filenames or macro code.
@@ -245,28 +269,52 @@
                     <span class="self">self</span>.index += <span class="number">1</span>;
                 }
                 <span class="string">'+' </span>=&gt; {
-                    tokens.push(BraincrapToken::Plus);
-                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>count: usize = <span class="number">0</span>;
+                    <span class="kw">while </span><span class="self">self</span>.current_char() == <span class="string">'+' </span>{
+                        <span class="self">self</span>.index += <span class="number">1</span>;
+                        count += <span class="number">1</span>;
+                    }
+                    tokens.push(BraincrapToken::Plus(count));
                 }
                 <span class="string">'-' </span>=&gt; {
-                    tokens.push(BraincrapToken::Minus);
-                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>count: usize = <span class="number">0</span>;
+                    <span class="kw">while </span><span class="self">self</span>.current_char() == <span class="string">'-' </span>{
+                        <span class="self">self</span>.index += <span class="number">1</span>;
+                        count += <span class="number">1</span>;
+                    }
+                    tokens.push(BraincrapToken::Minus(count));
                 }
                 <span class="string">'&lt;' </span>=&gt; {
-                    tokens.push(BraincrapToken::Left);
-                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>count: usize = <span class="number">0</span>;
+                    <span class="kw">while </span><span class="self">self</span>.current_char() == <span class="string">'&lt;' </span>{
+                        <span class="self">self</span>.index += <span class="number">1</span>;
+                        count += <span class="number">1</span>;
+                    }
+                    tokens.push(BraincrapToken::Left(count));
                 }
                 <span class="string">'&gt;' </span>=&gt; {
-                    tokens.push(BraincrapToken::Right);
-                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>count: usize = <span class="number">0</span>;
+                    <span class="kw">while </span><span class="self">self</span>.current_char() == <span class="string">'&gt;' </span>{
+                        <span class="self">self</span>.index += <span class="number">1</span>;
+                        count += <span class="number">1</span>;
+                    }
+                    tokens.push(BraincrapToken::Right(count));
                 }
                 <span class="string">'.' </span>=&gt; {
-                    tokens.push(BraincrapToken::Dot);
-                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>count: usize = <span class="number">0</span>;
+                    <span class="kw">while </span><span class="self">self</span>.current_char() == <span class="string">'.' </span>{
+                        <span class="self">self</span>.index += <span class="number">1</span>;
+                        count += <span class="number">1</span>;
+                    }
+                    tokens.push(BraincrapToken::Dot(count));
                 }
                 <span class="string">',' </span>=&gt; {
-                    tokens.push(BraincrapToken::Comma);
-                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>count: usize = <span class="number">0</span>;
+                    <span class="kw">while </span><span class="self">self</span>.current_char() == <span class="string">',' </span>{
+                        <span class="self">self</span>.index += <span class="number">1</span>;
+                        count += <span class="number">1</span>;
+                    }
+                    tokens.push(BraincrapToken::Comma(count));
                 }
                 <span class="string">'[' </span>=&gt; {
                     tokens.push(BraincrapToken::LeftBracket);

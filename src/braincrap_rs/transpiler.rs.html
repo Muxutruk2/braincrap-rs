@@ -109,7 +109,44 @@
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::parser::BraincrapCommand;
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::parser::BraincrapCommand;
+<span class="kw">use </span>log::error;
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[derive(Debug)]
@@ -128,6 +165,24 @@
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new()
     }
+}
+
+<span class="kw">fn </span>are_braces_balanced(code: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">let </span><span class="kw-2">mut </span>stack = Vec::new();
+
+    <span class="kw">for </span>c <span class="kw">in </span>code.chars() {
+        <span class="kw">match </span>c {
+            <span class="string">'[' </span>=&gt; stack.push(c),
+            <span class="string">']' </span>=&gt; {
+                <span class="kw">if </span>stack.pop().is_none() {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
+                }
+            }
+            <span class="kw">_ </span>=&gt; {}
+        }
+    }
+
+    stack.is_empty()
 }
 
 <span class="kw">impl </span>Transpiler {
@@ -159,6 +214,10 @@
             output.push_str(<span class="kw-2">&amp;</span>bf_command);
         }
 
+        <span class="kw">if </span>!are_braces_balanced(<span class="kw-2">&amp;</span>output) {
+            <span class="macro">error!</span>(<span class="string">"Braces not balanced!"</span>)
+        }
+
         output
     }
 
@@ -169,7 +228,8 @@
         <span class="kw">for </span>command <span class="kw">in </span>commands {
             <span class="kw">let </span>c_line = <span class="self">self</span>.transpile_command_c(<span class="kw-2">&amp;</span>command);
             output.push_str(<span class="kw-2">&amp;</span>c_line);
-        }
+            <span class="comment">// output.push('\n');
+        </span>}
 
         output
     }
@@ -177,14 +237,14 @@
     <span class="doccomment">/// Transpiles a single Braincrap command into Brainfuck
     </span><span class="kw">fn </span>transpile_command_bf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, command: <span class="kw-2">&amp;</span>BraincrapCommand) -&gt; String {
         <span class="kw">match </span>command {
-            BraincrapCommand::Addition =&gt; <span class="string">"+"</span>.to_string(),
-            BraincrapCommand::Substraction =&gt; <span class="string">"-"</span>.to_string(),
-            BraincrapCommand::MoveLeft =&gt; <span class="string">"&lt;"</span>.to_string(),
-            BraincrapCommand::MoveRight =&gt; <span class="string">"&gt;"</span>.to_string(),
+            BraincrapCommand::Addition(count) =&gt; <span class="string">"+"</span>.repeat(<span class="kw-2">*</span>count).to_string(),
+            BraincrapCommand::Substraction(count) =&gt; <span class="string">"-"</span>.repeat(<span class="kw-2">*</span>count).to_string(),
+            BraincrapCommand::MoveLeft(count) =&gt; <span class="string">"&lt;"</span>.repeat(<span class="kw-2">*</span>count).to_string(),
+            BraincrapCommand::MoveRight(count) =&gt; <span class="string">"&gt;"</span>.repeat(<span class="kw-2">*</span>count).to_string(),
             BraincrapCommand::OpenLoop =&gt; <span class="string">"["</span>.to_string(),
             BraincrapCommand::CloseLoop =&gt; <span class="string">"]"</span>.to_string(),
-            BraincrapCommand::Output =&gt; <span class="string">"."</span>.to_string(),
-            BraincrapCommand::Input =&gt; <span class="string">","</span>.to_string(),
+            BraincrapCommand::Output(count) =&gt; <span class="string">"."</span>.repeat(<span class="kw-2">*</span>count).to_string(),
+            BraincrapCommand::Input(count) =&gt; <span class="string">","</span>.repeat(<span class="kw-2">*</span>count).to_string(),
             BraincrapCommand::DefineMacro { name, code, .. } =&gt; {
                 <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile_brainfuck(code.clone());
                 <span class="self">self</span>.macros.insert(<span class="kw-2">*</span>name, expanded_code);
@@ -200,14 +260,26 @@
     <span class="doccomment">/// Transpiles a single Braincrap command into C
     </span><span class="kw">fn </span>transpile_command_c(<span class="kw-2">&amp;mut </span><span class="self">self</span>, command: <span class="kw-2">&amp;</span>BraincrapCommand) -&gt; String {
         <span class="kw">match </span>command {
-            BraincrapCommand::Addition =&gt; <span class="string">"a;"</span>.to_string(),
-            BraincrapCommand::Substraction =&gt; <span class="string">"s;"</span>.to_string(),
-            BraincrapCommand::MoveLeft =&gt; <span class="string">"l;"</span>.to_string(),
-            BraincrapCommand::MoveRight =&gt; <span class="string">"r;"</span>.to_string(),
-            BraincrapCommand::OpenLoop =&gt; <span class="string">"o;"</span>.to_string(),
-            BraincrapCommand::CloseLoop =&gt; <span class="string">"c;"</span>.to_string(),
-            BraincrapCommand::Output =&gt; <span class="string">"p;"</span>.to_string(),
-            BraincrapCommand::Input =&gt; <span class="string">"i;"</span>.to_string(),
+            BraincrapCommand::Addition(count) =&gt; <span class="macro">format!</span>(<span class="string">"(*ptr += {count});"</span>),
+            BraincrapCommand::Substraction(count) =&gt; <span class="macro">format!</span>(<span class="string">"(*ptr -= {count});"</span>),
+            BraincrapCommand::MoveLeft(count) =&gt; <span class="macro">format!</span>(<span class="string">"(ptr -= {count});"</span>),
+            BraincrapCommand::MoveRight(count) =&gt; <span class="macro">format!</span>(<span class="string">"(ptr += {count});"</span>),
+            BraincrapCommand::OpenLoop =&gt; <span class="string">"while(*ptr != 0){"</span>.to_string(),
+            BraincrapCommand::CloseLoop =&gt; <span class="string">"}"</span>.to_string(),
+            BraincrapCommand::Output(count) =&gt; {
+                <span class="kw">if </span><span class="kw-2">*</span>count &gt;= <span class="number">3 </span>{
+                    <span class="macro">format!</span>(<span class="string">"for(int i=0;i&lt;{count};i++){{putchar(*ptr);}}"</span>)
+                } <span class="kw">else </span>{
+                    <span class="string">"putchar(*ptr);"</span>.repeat(<span class="kw-2">*</span>count).to_string()
+                }
+            }
+            BraincrapCommand::Input(count) =&gt; {
+                <span class="kw">if </span><span class="kw-2">*</span>count &gt;= <span class="number">2 </span>{
+                    <span class="macro">format!</span>(<span class="string">"for(i=0;i&lt;{count};i++){{*ptr = getchar());}}"</span>)
+                } <span class="kw">else </span>{
+                    <span class="string">"(*ptr = getchar());"</span>.repeat(<span class="kw-2">*</span>count).to_string()
+                }
+            }
             BraincrapCommand::DefineMacro { name, code, .. } =&gt; {
                 <span class="kw">let </span>expanded_code = <span class="self">self</span>.transpile_c(code.clone());
                 <span class="self">self</span>.macros.insert(<span class="kw-2">*</span>name, expanded_code);

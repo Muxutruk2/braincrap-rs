@@ -5,21 +5,21 @@ use braincrap_rs::transpiler::{Transpiler, TranspilerArguments};
 #[test]
 fn test_transpile_basic_commands() {
     let commands = vec![
-        BraincrapCommand::Addition,
-        BraincrapCommand::Substraction,
-        BraincrapCommand::MoveLeft,
-        BraincrapCommand::MoveRight,
+        BraincrapCommand::Addition(1),
+        BraincrapCommand::Substraction(1),
+        BraincrapCommand::MoveLeft(1),
+        BraincrapCommand::MoveRight(1),
         BraincrapCommand::OpenLoop,
         BraincrapCommand::CloseLoop,
-        BraincrapCommand::Output,
-        BraincrapCommand::Input,
+        BraincrapCommand::Output(1),
+        BraincrapCommand::Input(1),
     ];
 
     let mut transpiler = Transpiler::new();
     let bf_result = transpiler.transpile(commands.clone(), &TranspilerArguments::Brainfuck);
     let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
-    assert_eq!(c_result, "a;s;l;r;o;c;p;i;");
+    assert_eq!(c_result, "(*ptr += 1);(*ptr -= 1);(ptr -= 1);(ptr += 1);while(*ptr != 0){}putchar(*ptr);(*ptr = getchar());");
     assert_eq!(bf_result, "+-<>[].,");
 }
 
@@ -29,7 +29,10 @@ fn test_transpile_macro_definition_and_run() {
         BraincrapCommand::DefineMacro {
             name: 'a',
             tokens: vec![],
-            code: vec![BraincrapCommand::Addition, BraincrapCommand::MoveRight],
+            code: vec![
+                BraincrapCommand::Addition(1),
+                BraincrapCommand::MoveRight(1),
+            ],
         },
         BraincrapCommand::RunMacro { name: 'a' },
         BraincrapCommand::RunMacro { name: 'a' },
@@ -40,7 +43,7 @@ fn test_transpile_macro_definition_and_run() {
     let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
     assert_eq!(bf_result, "+>+>");
-    assert_eq!(c_result, "a;r;a;r;");
+    assert_eq!(c_result, "(*ptr += 1);(ptr += 1);(*ptr += 1);(ptr += 1);");
 }
 
 #[test]
@@ -61,13 +64,13 @@ fn test_transpile_macro_with_redefinition() {
         BraincrapCommand::DefineMacro {
             name: 'a',
             tokens: vec![],
-            code: vec![BraincrapCommand::Addition],
+            code: vec![BraincrapCommand::Addition(1)],
         },
         BraincrapCommand::RunMacro { name: 'a' },
         BraincrapCommand::DefineMacro {
             name: 'a',
             tokens: vec![],
-            code: vec![BraincrapCommand::Substraction],
+            code: vec![BraincrapCommand::Substraction(1)],
         },
         BraincrapCommand::RunMacro { name: 'a' },
     ];
@@ -77,7 +80,7 @@ fn test_transpile_macro_with_redefinition() {
     let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
     assert_eq!(bf_result, "+-");
-    assert_eq!(c_result, "a;s;");
+    assert_eq!(c_result, "(*ptr += 1);(*ptr -= 1);");
 }
 
 #[test]
@@ -85,7 +88,7 @@ fn test_transpile_import() {
     let commands = vec![BraincrapCommand::Import {
         file: "other.bcf".to_string(),
         tokens: vec![],
-        code: vec![BraincrapCommand::Addition, BraincrapCommand::MoveLeft],
+        code: vec![BraincrapCommand::Addition(1), BraincrapCommand::MoveLeft(1)],
     }];
 
     let mut transpiler = Transpiler::new();
@@ -93,7 +96,7 @@ fn test_transpile_import() {
     let c_result = transpiler.transpile(commands, &TranspilerArguments::C);
 
     assert_eq!(bf_result, "+<");
-    assert_eq!(c_result, "a;l;");
+    assert_eq!(c_result, "(*ptr += 1);(ptr -= 1);");
 }
 
 #[test]

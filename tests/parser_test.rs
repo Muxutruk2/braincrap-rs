@@ -6,12 +6,12 @@ use std::path::PathBuf;
 #[test]
 fn test_parse_basic_commands() {
     let tokens = vec![
-        BraincrapToken::Plus,
-        BraincrapToken::Minus,
-        BraincrapToken::Right,
-        BraincrapToken::Left,
-        BraincrapToken::Dot,
-        BraincrapToken::Comma,
+        BraincrapToken::Plus(1),
+        BraincrapToken::Minus(1),
+        BraincrapToken::Right(1),
+        BraincrapToken::Left(1),
+        BraincrapToken::Dot(1),
+        BraincrapToken::Comma(1),
         BraincrapToken::LeftBracket,
         BraincrapToken::RightBracket,
     ];
@@ -22,12 +22,12 @@ fn test_parse_basic_commands() {
     assert_eq!(
         commands,
         vec![
-            BraincrapCommand::Addition,
-            BraincrapCommand::Substraction,
-            BraincrapCommand::MoveRight,
-            BraincrapCommand::MoveLeft,
-            BraincrapCommand::Output,
-            BraincrapCommand::Input,
+            BraincrapCommand::Addition(1),
+            BraincrapCommand::Substraction(1),
+            BraincrapCommand::MoveRight(1),
+            BraincrapCommand::MoveLeft(1),
+            BraincrapCommand::Output(1),
+            BraincrapCommand::Input(1),
             BraincrapCommand::OpenLoop,
             BraincrapCommand::CloseLoop,
         ]
@@ -49,8 +49,8 @@ fn test_parse_macro_definition() {
         commands,
         vec![BraincrapCommand::DefineMacro {
             name: 'a',
-            tokens: vec![BraincrapToken::Plus],
-            code: vec![BraincrapCommand::Addition],
+            tokens: vec![BraincrapToken::Plus(1)],
+            code: vec![BraincrapCommand::Addition(1)],
         }]
     );
 }
@@ -94,7 +94,7 @@ fn test_parse_import() {
 #[test]
 fn test_parse_mixed_commands_and_macro() {
     let tokens = vec![
-        BraincrapToken::Plus,
+        BraincrapToken::Plus(1),
         BraincrapToken::Hash,
         BraincrapToken::Char('a'),
         BraincrapToken::String("+".to_string()),
@@ -109,11 +109,11 @@ fn test_parse_mixed_commands_and_macro() {
     assert_eq!(
         commands,
         vec![
-            BraincrapCommand::Addition,
+            BraincrapCommand::Addition(1),
             BraincrapCommand::DefineMacro {
                 name: 'a',
-                tokens: vec![BraincrapToken::Plus],
-                code: vec![BraincrapCommand::Addition],
+                tokens: vec![BraincrapToken::Plus(1)],
+                code: vec![BraincrapCommand::Addition(1)],
             },
             BraincrapCommand::RunMacro { name: 'b' },
             BraincrapCommand::Import {

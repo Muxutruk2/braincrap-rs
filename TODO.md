@@ -1,0 +1,2 @@
+- [x] Optimize the parser by avoiding repetition `Addition(4)` instead of `Addition, Addition, Addition, Addition`
+- [ ] Make the C code even smaller

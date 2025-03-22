@@ -6,14 +6,14 @@ use std::path::PathBuf;
 /// Represents a Braincrap command that the parser recognizes.
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum BraincrapCommand {
-    Addition,
-    Substraction,
-    MoveLeft,
-    MoveRight,
+    Addition(usize),
+    Substraction(usize),
+    MoveLeft(usize),
+    MoveRight(usize),
     OpenLoop,
     CloseLoop,
-    Output,
-    Input,
+    Output(usize),
+    Input(usize),
     /// Defines a macro
     DefineMacro {
         name: char,
@@ -119,14 +119,16 @@ impl<'a> Parser<'a> {
 
         while let Some(token) = self.next_token() {
             match token {
-                BraincrapToken::Plus => commands.push(BraincrapCommand::Addition),
-                BraincrapToken::Minus => commands.push(BraincrapCommand::Substraction),
-                BraincrapToken::Left => commands.push(BraincrapCommand::MoveLeft),
-                BraincrapToken::Right => commands.push(BraincrapCommand::MoveRight),
+                BraincrapToken::Plus(count) => commands.push(BraincrapCommand::Addition(count)),
+                BraincrapToken::Minus(count) => {
+                    commands.push(BraincrapCommand::Substraction(count))
+                }
+                BraincrapToken::Left(count) => commands.push(BraincrapCommand::MoveLeft(count)),
+                BraincrapToken::Right(count) => commands.push(BraincrapCommand::MoveRight(count)),
                 BraincrapToken::LeftBracket => commands.push(BraincrapCommand::OpenLoop),
                 BraincrapToken::RightBracket => commands.push(BraincrapCommand::CloseLoop),
-                BraincrapToken::Dot => commands.push(BraincrapCommand::Output),
-                BraincrapToken::Comma => commands.push(BraincrapCommand::Input),
+                BraincrapToken::Dot(count) => commands.push(BraincrapCommand::Output(count)),
+                BraincrapToken::Comma(count) => commands.push(BraincrapCommand::Input(count)),
 
                 BraincrapToken::Hash => {
                     if let Some(BraincrapToken::Char(name)) = self.next_token() {

@@ -8,14 +8,14 @@ use log::error;
 /// Represents different token types recognized by the lexer.
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum BraincrapToken {
-    Plus,
-    Minus,
-    Left,
-    Right,
+    Plus(usize),
+    Minus(usize),
+    Left(usize),
+    Right(usize),
     LeftBracket,
     RightBracket,
-    Dot,
-    Comma,
+    Dot(usize),
+    Comma(usize),
     Hash,
     Dollar,
     /// Represents a string, used for filenames or macro code.
@@ -91,28 +91,52 @@ impl Lexer {
                     self.index += 1;
                 }
                 '+' => {
-                    tokens.push(BraincrapToken::Plus);
-                    self.index += 1;
+                    let mut count: usize = 0;
+                    while self.current_char() == '+' {
+                        self.index += 1;
+                        count += 1;
+                    }
+                    tokens.push(BraincrapToken::Plus(count));
                 }
                 '-' => {
-                    tokens.push(BraincrapToken::Minus);
-                    self.index += 1;
+                    let mut count: usize = 0;
+                    while self.current_char() == '-' {
+                        self.index += 1;
+                        count += 1;
+                    }
+                    tokens.push(BraincrapToken::Minus(count));
                 }
                 '<' => {
-                    tokens.push(BraincrapToken::Left);
-                    self.index += 1;
+                    let mut count: usize = 0;
+                    while self.current_char() == '<' {
+                        self.index += 1;
+                        count += 1;
+                    }
+                    tokens.push(BraincrapToken::Left(count));
                 }
                 '>' => {
-                    tokens.push(BraincrapToken::Right);
-                    self.index += 1;
+                    let mut count: usize = 0;
+                    while self.current_char() == '>' {
+                        self.index += 1;
+                        count += 1;
+                    }
+                    tokens.push(BraincrapToken::Right(count));
                 }
                 '.' => {
-                    tokens.push(BraincrapToken::Dot);
-                    self.index += 1;
+                    let mut count: usize = 0;
+                    while self.current_char() == '.' {
+                        self.index += 1;
+                        count += 1;
+                    }
+                    tokens.push(BraincrapToken::Dot(count));
                 }
                 ',' => {
-                    tokens.push(BraincrapToken::Comma);
-                    self.index += 1;
+                    let mut count: usize = 0;
+                    while self.current_char() == ',' {
+                        self.index += 1;
+                        count += 1;
+                    }
+                    tokens.push(BraincrapToken::Comma(count));
                 }
                 '[' => {
                     tokens.push(BraincrapToken::LeftBracket);

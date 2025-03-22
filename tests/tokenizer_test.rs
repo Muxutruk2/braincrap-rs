@@ -10,12 +10,12 @@ fn test_tokenize_basic_symbols() {
     assert_eq!(
         tokens,
         vec![
-            BraincrapToken::Plus,
-            BraincrapToken::Minus,
-            BraincrapToken::Right,
-            BraincrapToken::Left,
-            BraincrapToken::Dot,
-            BraincrapToken::Comma,
+            BraincrapToken::Plus(1),
+            BraincrapToken::Minus(1),
+            BraincrapToken::Right(1),
+            BraincrapToken::Left(1),
+            BraincrapToken::Dot(1),
+            BraincrapToken::Comma(1),
             BraincrapToken::LeftBracket,
             BraincrapToken::RightBracket,
         ]
@@ -71,5 +71,8 @@ fn test_tokenize_whitespace_and_comments() {
     let mut lexer = Lexer::new(input.to_string());
     let tokens = lexer.tokenize();
 
-    assert_eq!(tokens, vec![BraincrapToken::Plus, BraincrapToken::Minus,]);
+    assert_eq!(
+        tokens,
+        vec![BraincrapToken::Plus(1), BraincrapToken::Minus(1),]
+    );
 }
